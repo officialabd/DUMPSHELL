@@ -1,4 +1,4 @@
-OBJS = dumpshell.c
+OBJS = main.c
 CC = gcc
 OBJ_NAME = out/a
 all : $(OBJS)

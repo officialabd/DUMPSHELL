@@ -118,41 +118,37 @@ void pwd(size_t size) {
 }
 
 void cd(char **path) {
-    char *des;
-
-    if (path[2] != NULL) {
+    if (path[2] != NULL) { /* More than one arg passed */
         fprintf(stderr, "There are too many args\n");
         return;
     }
 
-    if (!path[1]) {
+    if (!path[1] || (path[1][0] == '~')) { /* To change the directory to the /home/user */
         char buf[MAX_PATH_SIZE];
-        char desPth[MAX_PATH_SIZE];
-        strcpy(desPth, "/home/");
+        char desPth[] = "/home/";
         strcpy(buf, getlogin());
         strcat(desPth, buf);
         if (chdir(desPth) == -1) {
             perror("chdir");
         }
-        char s[100];
-        printf("%s\n", getcwd(s, 100));
         return;
     }
 
+    char des[MAX_PATH_SIZE];
+    char newPath[MAX_PATH_SIZE];
+
     strcpy(des, path[1]);
-    printf("des %s  path %s\n", des, path[1]);
+    strcpy(newPath, getcwd_(MAX_PATH_SIZE));
 
-    if (!(*des)) {
-        char *newPath = getcwd_(MAX_PATH_SIZE);
-        if (des[0] != '/') {
-            printf("EQUAL");
-
-            strcat(newPath, "/");
-            strcat(newPath, des);
-            chdir(newPath);
-        } else {
-            chdir(des);
-            printf("NOT EQUAL");
+    if (des[0] != '/') {
+        strcat(newPath, "/");
+        strcat(newPath, des);
+        if (chdir(newPath) == -1) {
+            perror("chdir");
+        }
+    } else {
+        if (chdir(des) == -1) {
+            perror("chdir");
         }
     }
 }
@@ -174,32 +170,17 @@ int extra_commands(struct cmd *c) {
 }
 
 void execute(struct cmd *clist) {
-    int pid, npid, stat;
-    int fd[2];
-    if ((pipe(fd) == -1)) {
-        perror("pipe");
-        return;
-    }
+    int npid, stat;
 
-    pid = fork();
-    if (pid == -1) {
-        perror("dumbshell:fork");
+    if (!extra_commands(clist)) {
+        execvp(clist->exe_path, clist->arg);
+        fprintf(stderr, "No such command: %s\n", clist->exe_path);
         exit(1);
     }
 
-    if (!pid) {
-        /* child */
-        if (!extra_commands(clist)) {
-            execvp(clist->exe_path, clist->arg);
-            fprintf(stderr, "No such command: %s\n", clist->exe_path);
-            exit(1);
-        }
-        exit(1);
-    }
-    do {
-        npid = wait(&stat);
-        printf("Process %d exited with status %d\n", npid, stat);
-    } while (npid != pid);
+    npid = wait(&stat);
+    printf("Process %d exited with status %d\n", npid, stat);
+
     switch (clist->terminator) {
         case SEQUENCE:
             execute(clist->next);

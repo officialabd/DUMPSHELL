@@ -1,9 +1,20 @@
+#include <ctype.h>
+#include <dirent.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/ioctl.h>
+#include <sys/procfs.h>
+#include <sys/stat.h>
 #include <sys/wait.h>
 #include <unistd.h>
+
+int fdproc;
+DIR *dirp;
+struct dirent *DirEntry;
+struct elf_prpsinfo pinfo;
 
 #define DEBUG 1
 #define MAXLINELEN 4096
@@ -153,6 +164,48 @@ void cd(char **path) {
     }
 }
 
+void printProc(int pid) {
+    // sscanf(args[i], "%d", &pid);
+    printf("pid = %d\n", pid);
+
+    char filename[1000];
+    sprintf(filename, "/proc/%d/stat", pid);
+    FILE *f = fopen(filename, "r");
+
+    int unused;
+    char comm[1000];
+    char state;
+    int ppid;
+    int time;
+    fscanf(f, "%d %s %c %d %d", &unused, comm, &state, &ppid, &time);
+    printf("comm = %s\n", comm);
+    printf("state = %c\n", state);
+    printf("parent pid = %d\n", ppid);
+    printf("time = %d\n", time);
+
+    fclose(f);
+}
+
+void ps(char **args) {
+    if (!(args[1])) {
+        printf("1\n");
+        printProc(getppid());
+        int cpid = getpid();
+        printProc(cpid);
+    } else if (!(strcmp(args[1], "-A")) || !(strcmp(args[1], "-a"))) {
+        printf("2\n");
+    } else {
+        printf("3\n");
+
+        int i = 1;
+        while (args[i] != NULL) {
+            int pid = strtol(args[i], NULL, 10);
+            printProc(pid);
+            i++;
+        }
+    }
+}
+
 int extra_commands(struct cmd *c) {
     char cmd[MAX_PATH_SIZE];
 
@@ -164,9 +217,12 @@ int extra_commands(struct cmd *c) {
     } else if (!strcmp(cmd, "cd")) {
         cd(c->arg);
         return 1;
+    } else if (!strcmp(cmd, "ps")) {
+        ps(c->arg);
+        return 1;  // Change it later to 1  -----------------<<<<<<<<<<<<<
+    } else {
+        return 0;
     }
-
-    return 0;
 }
 
 void execute(struct cmd *clist) {

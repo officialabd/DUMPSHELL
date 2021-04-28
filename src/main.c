@@ -161,11 +161,11 @@ void cd(char **path) {
     }
 }
 
-char *timeParser(char *ptime, long long time) {
-    int msecs = ((time / (double)100) - (time / 100)) * 100;
-    int totSecs = time / 100;
+char *timeParser(char *ptime, unsigned long time) {
+    int msecs = ((time / (double)ticksPerSec) - (time / ticksPerSec)) * ticksPerSec;
+    int totSecs = time / ticksPerSec;
     int totMins = totSecs / 60;
-    int secs = (time / 100) - ((int)(time / (100 * 60)) * 60);
+    int secs = (time / ticksPerSec) - ((int)(time / (ticksPerSec * 60)) * 60);
     int mins = totSecs / 60 - ((int)(totSecs / (60 * 60)) * 60);
     int hours = totMins / 60;
 
@@ -203,13 +203,13 @@ char **getState_CMD(char **data, int pid) {
     char cmd[64];
     char state;
     long long tty;
-    long long time;
+    unsigned long utime, stime;
 
-    fscanf(stateFile, "%*d %s %c %*d %*d %*d %lld %*d %*d %*d %*d %*d %*d %lld", cmd, &state, &tty, &time);
+    fscanf(stateFile, "%*d %s %c %*d %*d %*d %lld %*d %*d %*d %*d %*d %*d %lu %lu", cmd, &state, &tty, &utime, &stime);
 
     sprintf(data[0], "%lld", tty);
     sprintf(data[1], "%c", state);
-    sprintf(data[2], "%s", timeParser(data[2], time));
+    sprintf(data[2], "%s", timeParser(data[2], (utime + stime)));
     sprintf(data[3], "%s", cmd);
 
     fclose(stateFile);

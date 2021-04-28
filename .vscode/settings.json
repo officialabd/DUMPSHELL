@@ -3,6 +3,11 @@
         "dirent.h": "c",
         "wait.h": "c",
         "unistd.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "procfs.h": "c",
+        "fcntl.h": "c",
+        "string.h": "c",
+        "stdio.h": "c",
+        "stat.h": "c"
     }
 }

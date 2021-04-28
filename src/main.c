@@ -11,11 +11,6 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-int fdproc;
-DIR *dirp;
-struct dirent *DirEntry;
-struct elf_prpsinfo pinfo;
-
 #define DEBUG 1
 #define MAXLINELEN 4096
 #define MAXARGS 128
@@ -23,6 +18,8 @@ struct elf_prpsinfo pinfo;
 #define SEQ_OP ';'
 #define SEQUENCE 1
 #define MAX_PATH_SIZE 1024
+
+long ticksPerSec;
 
 struct cmd {
     struct cmd *next;
@@ -164,39 +161,101 @@ void cd(char **path) {
     }
 }
 
-void printProc(int pid) {
-    // sscanf(args[i], "%d", &pid);
-    printf("pid = %d\n", pid);
+char *timeParser(char *ptime, long long time) {
+    int msecs = ((time / (double)100) - (time / 100)) * 100;
+    int totSecs = time / 100;
+    int totMins = totSecs / 60;
+    int secs = (time / 100) - ((int)(time / (100 * 60)) * 60);
+    int mins = totSecs / 60 - ((int)(totSecs / (60 * 60)) * 60);
+    int hours = totMins / 60;
 
+    ptime = malloc(1028);
+    if (!ptime) {
+        free(ptime);
+        return NULL;
+    }
+    sprintf(ptime, "%.2d:%.2d:%.2d:%.2d", hours, mins, secs, msecs);
+
+    return ptime;
+}
+
+char **getState_CMD(char **data, int pid) {
+    char path[MAX_PATH_SIZE], line[100], *p;
+
+    sprintf(path, "/proc/%d/stat", pid);
+    FILE *stateFile = fopen(path, "r");
+
+    if (!stateFile) {
+        perror("File");
+        return NULL;
+    }
+    data = malloc(sizeof(char *) * 4);
+    if (!data)
+        return NULL;
+    for (int j = 0; j < 4; j++) {
+        data[j] = malloc(100);
+        if (!data[j]) {
+            free(data);
+            return NULL;
+        }
+    }
+
+    char cmd[64];
+    char state;
+    long long tty;
+    long long time;
+
+    fscanf(stateFile, "%*d %s %c %*d %*d %*d %lld %*d %*d %*d %*d %*d %*d %lld", cmd, &state, &tty, &time);
+
+    sprintf(data[0], "%lld", tty);
+    sprintf(data[1], "%c", state);
+    sprintf(data[2], "%s", timeParser(data[2], time));
+    sprintf(data[3], "%s", cmd);
+
+    fclose(stateFile);
+
+    return data;
+}
+
+void printProc(int pid) {
     char filename[1000];
     sprintf(filename, "/proc/%d/stat", pid);
     FILE *f = fopen(filename, "r");
 
-    int unused;
-    char comm[1000];
-    char state;
-    int ppid;
-    int time;
-    fscanf(f, "%d %s %c %d %d", &unused, comm, &state, &ppid, &time);
-    printf("comm = %s\n", comm);
-    printf("state = %c\n", state);
-    printf("parent pid = %d\n", ppid);
-    printf("time = %d\n", time);
+    char **data = getState_CMD(data, pid);
+
+    char *tty = data[0];
+    char *state = data[1];
+    char *time = data[2];
+    char *cmd = data[3];
+    tty = ttyname(strtol(tty, NULL, 10));
+
+    printf("%6d%12s\t%1s\t%12s\t%s\n", pid, tty, state, time, cmd);
 
     fclose(f);
 }
 
 void ps(char **args) {
-    if (!(args[1])) {
-        printf("1\n");
-        printProc(getppid());
-        int cpid = getpid();
-        printProc(cpid);
-    } else if (!(strcmp(args[1], "-A")) || !(strcmp(args[1], "-a"))) {
-        printf("2\n");
-    } else {
-        printf("3\n");
+    printf("%6s%12s\t%1s\t%12s\t%s\n", "PID", "TTY", "STATE", "TIME", "CMD");
 
+    if (!(args[1])) {
+        printProc(getppid());
+        printProc(getpid());
+    } else if (!(strcmp(args[1], "-A")) || !(strcmp(args[1], "-a"))) {
+        struct dirent *sd;
+        DIR *dir = opendir("/proc");
+        if (dir == NULL) {
+            perror("DIR: Unable to open directory");
+            exit(EXIT_FAILURE);
+        }
+        while ((sd = readdir(dir)) != NULL) {
+            if ((sd->d_type == DT_DIR)) {
+                int pid = strtol(sd->d_name, NULL, 10);
+                if (pid > 0)
+                    printProc(pid);
+            }
+        }
+    } else {
         int i = 1;
         while (args[i] != NULL) {
             int pid = strtol(args[i], NULL, 10);
@@ -261,6 +320,7 @@ char *get_command(char *buf, int size, FILE *in) {
 }
 
 void main(void) {
+    ticksPerSec = sysconf(_SC_CLK_TCK);
     char linebuf[MAXLINELEN];
     struct cmd *commands;
     char *ch = get_command(linebuf, MAXLINELEN, stdin);

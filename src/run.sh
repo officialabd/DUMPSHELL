@@ -1,3 +1,3 @@
-rm out/a
+rm ../out/a
 make
-./out/a
+./../out/a

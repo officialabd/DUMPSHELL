@@ -8,6 +8,15 @@
         "fcntl.h": "c",
         "string.h": "c",
         "stdio.h": "c",
-        "stat.h": "c"
+        "stat.h": "c",
+        "termios.h": "c",
+        "cstdlib": "c",
+        "typeinfo": "c",
+        "inputhandler.h": "c",
+        "errno.h": "c",
+        "pwdcommand.h": "c",
+        "pscommand.h": "c",
+        "cdcommand.h": "c",
+        "killcommand.h": "c"
     }
 }

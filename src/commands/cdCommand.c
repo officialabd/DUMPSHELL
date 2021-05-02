@@ -1,12 +1,12 @@
 #include "../../headers/commands/cdCommand.h"
 
-void cd(char **path) {
-    if (path[2] != NULL) { /* More than one arg passed */
+void cd(char **args) {
+    if (args[2] != NULL) { /* More than one arg passed */
         fprintf(stderr, "There are too many args\n");
         return;
     }
 
-    if (!path[1] || (path[1][0] == '~')) { /* To change the directory to the /home/user */
+    if (!args[1] || (args[1][0] == '~')) { /* To change the directory to the /home/user */
         char buf[MAX_PATH_SIZE];
         char desPth[] = "/home/";
         strcpy(buf, getlogin());
@@ -20,16 +20,16 @@ void cd(char **path) {
     char des[MAX_PATH_SIZE];
     char newPath[MAX_PATH_SIZE];
 
-    strcpy(des, path[1]);
+    strcpy(des, args[1]);
     strcpy(newPath, getcwd_(MAX_PATH_SIZE));
 
-    if (des[0] != '/') {
+    if (des[0] != '/') { /** If user inputs sub or parent directory of the current directory */
         strcat(newPath, "/");
         strcat(newPath, des);
         if (chdir(newPath) == -1) {
             perror("chdir");
         }
-    } else {
+    } else { /** If user inputs a full path directory */
         if (chdir(des) == -1) {
             perror("chdir");
         }

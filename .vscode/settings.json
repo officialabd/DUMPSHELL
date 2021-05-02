@@ -17,6 +17,7 @@
         "pwdcommand.h": "c",
         "pscommand.h": "c",
         "cdcommand.h": "c",
-        "killcommand.h": "c"
+        "killcommand.h": "c",
+        "historyhandler.h": "c"
     }
 }

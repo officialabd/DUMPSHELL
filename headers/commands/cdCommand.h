@@ -5,4 +5,9 @@
 
 #include "pwdCommand.h"
 
-void cd(char **path);
+/**
+ * This function change the current directory path to the new path
+ * @param[in] args User input arguments provided with cd command for the new path
+ * @return No return value (void)
+ */
+void cd(char **args);

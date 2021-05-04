@@ -10,4 +10,4 @@
  * @param[in] args User input arguments provided with cd command for the new path
  * @return No return value (void)
  */
-void cd(char **args);
+void icd(char **args);

@@ -11,30 +11,20 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include "../headers/commands/cdCommand.h"
-#include "../headers/commands/psCommand.h"
-#include "../headers/commands/pwdCommand.h"
+#include "../headers/handlers/commandsHandler.h"
 #include "../headers/handlers/inputHandler.h"
 
 #define DEBUG 1
 #define MAXLINELEN 4096
-#define MAXARGS 128
 #define END_OF_LINE 0
 #define SEQ_OP ';'
 #define SEQUENCE 1
 #define MAX_PATH_SIZE 1024
-#define KEY_UP 65
-#define KEY_DOWN 66
-#define KEY_LEFT 67
-#define KEY_RIGHT 68
+#define UP "UP"
+#define DOWN "DOWN"
+#define LEFT "LEFT"
+#define RIGHT "RIGHT"
 
-struct cmd {
-    struct cmd *next;
-    int terminator;
-    char *exe_path;
-    int nargs;
-    char *arg[MAXARGS];
-};
 /**
  * Allocate size bytes of memory.
 */
@@ -85,8 +75,7 @@ struct cmd *parse_commands(char *line) {
         if (!ptr) {
             break;
         }
-        if (*ptr == SEQ_OP) {  // ------------- check later
-
+        if (*ptr == SEQ_OP) {
             *ptr = 0;
             cur->next = parse_commands(ptr + 1);
             if (cur->next) {
@@ -99,38 +88,13 @@ struct cmd *parse_commands(char *line) {
         if (!ptr) {
             break;
         }
-        if (*ptr == SEQ_OP) {
-            /* found a sequence operator */
-            cur->next = parse_commands(ptr + 1);
-            if (cur->next) {
-                cur->terminator = SEQUENCE;
-            }
-            break;
-        }
+
         cur->arg[ix] = ptr;
         ++ix;
     }
     cur->arg[ix] = 0;
     cur->nargs = ix;
     return cur;
-}
-
-int extra_commands(struct cmd *c) {
-    char cmd[MAX_PATH_SIZE];
-
-    strcpy(cmd, c->exe_path);
-
-    if (!strcmp(cmd, "pwd")) {
-        pwd(MAX_PATH_SIZE);
-        return 1;
-    } else if (!strcmp(cmd, "ps")) {
-        ps(c->arg);
-        return 1;
-    } else if (!strcmp(cmd, "cd")) {
-        return 1;
-    } else {
-        return 0;
-    }
 }
 
 void execute(struct cmd *clist) {
@@ -143,25 +107,29 @@ void execute(struct cmd *clist) {
     }
 
     if (!pid) {
-        if (!extra_commands(clist)) {
+        if (!handle(clist)) {
             execvp(clist->exe_path, clist->arg);
             fprintf(stderr, "No such command: %s\n", clist->exe_path);
         }
         exit(1);
     } else {
         if (!strcmp(clist->exe_path, "cd")) {
-            cd(clist->arg);
+            icd(clist->arg);
         }
     }
     do {
         npid = wait(&stat);
-        printf("Process %d exited with status %d\n", npid, stat);
+        if (strcmp(clist->exe_path, "clear"))
+            printf(">\033[36mProcess\033[0m %d \033[36mexited with status\033[0m %d\n", npid, stat);
     } while (npid != pid);
     switch (clist->terminator) {
         case SEQUENCE:
             execute(clist->next);
     }
 }
+
+// cd home
+// kill print
 void free_commands(struct cmd *clist) {
     struct cmd *nxt;
 
@@ -174,21 +142,30 @@ void free_commands(struct cmd *clist) {
 
 char *get_command(char *buf, int size, FILE *in) {
     if (in == stdin) {
+        char *username = getlogin();
+        char *path = getcwd_(MAX_PATH_SIZE);
+        if (strlen(path) >= (6 + strlen(username))) path += 9;
         char *firstLine = calloc(CHAR_SIZE, MAX_PATH_SIZE);
-        sprintf(firstLine, "~%s@ ", (getcwd_(MAX_PATH_SIZE) + 9));
+        sprintf(firstLine, "\033[31m%s@%s\033[0m:\033[32m~%s\033[0m@ ", username, username, path);
         fputs(firstLine, stdout);
         free(firstLine);
     }
+    // buf = calloc(CHAR_SIZE, MAX_PATH_SIZE);
     buf = handleInput(buf, size);
-    // printf("buf: (%s) ", buf);
+    // openHistory("a");
+    // put(buf);
+    // closeHistory();
     return buf;
 }
 
 void main(void) {
     char linebuf[MAXLINELEN];
     struct cmd *commands;
-    char *ch = get_command(linebuf, MAXLINELEN, stdin);
 
+    char *ch = "clear";
+    commands = parse_commands(ch);
+    execute(commands);
+    ch = get_command(linebuf, MAXLINELEN, stdin);
     while (&ch != NULL) {
         commands = parse_commands(ch);
         if (commands) {

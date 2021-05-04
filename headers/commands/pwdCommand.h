@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <unistd.h>
 
 #define MAX_PATH_SIZE 1024
@@ -8,7 +9,7 @@
  * @param[in] size The size of the path  
  * @return No return value (void)
  */
-void pwd(size_t size);
+void ipwd(size_t size);
 
 /**
  * This function get the current directory path

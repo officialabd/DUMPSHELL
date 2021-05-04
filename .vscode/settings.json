@@ -18,6 +18,8 @@
         "pscommand.h": "c",
         "cdcommand.h": "c",
         "killcommand.h": "c",
-        "historyhandler.h": "c"
+        "historyhandler.h": "c",
+        "signal.h": "c",
+        "commandshandler.h": "c"
     }
 }

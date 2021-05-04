@@ -13,7 +13,7 @@
  * @param[in] args User input arguments (flags for ps) 
  * @return No return value (void)
  */
-void ps(char **args);
+void ips(char **args);
 
 /**
  * It prints all data(PID, TTY, STATE, TIME, CMD) of the process

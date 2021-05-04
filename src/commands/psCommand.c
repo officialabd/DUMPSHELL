@@ -1,6 +1,6 @@
 #include "../../headers/commands/psCommand.h"
 
-void ps(char **args) {
+void ips(char **args) {
     printf("%6s%12s\t%1s\t%12s\t%s\n", "PID", "TTY", "STATE", "TIME", "CMD");
 
     if (!(args[1])) {
@@ -25,16 +25,16 @@ void ps(char **args) {
     } else {
         int i = 1;
         while (args[i] != NULL) {
-            int pid = strtol(args[i], NULL, 10);
+            int pid = strtol(args[i++], NULL, 10);
             printProc(pid);
         }
     }
 }
 
 void printProc(int pid) {
-    char filename[1000];
-    sprintf(filename, "/proc/%d/stat", pid);
-    FILE *f = fopen(filename, "r");
+    char path[1000];
+    sprintf(path, "/proc/%d/stat", pid);
+    FILE *f = fopen(path, "r");
     if (!f) {
         perror("Open directory");
         return;
@@ -52,7 +52,7 @@ void printProc(int pid) {
 }
 
 char **getStat(char **data, int pid) {
-    char statPath[MAX_PATH_SIZE], fdPath[MAX_PATH_SIZE], line[100];
+    char statPath[MAX_PATH_SIZE], fdPath[MAX_PATH_SIZE];
 
     sprintf(statPath, "/proc/%d/stat", pid);
     FILE *statFile = fopen(statPath, "r");

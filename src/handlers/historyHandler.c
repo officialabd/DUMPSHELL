@@ -1,33 +1,37 @@
 #include "../../headers/handlers/historyHandler.h"
 
-int current_index = 0; /** Used to determin the current index of the cmdLine*/
-int counter = 0;
+int current_index = 0; /** Used to determine the current index of the cmdLine*/
+int histLength = 0;
 
-char *getUp() {
-    fpos_t position;
-    int s = sizeof(*hist);
-    printf("siz: %d\n", s);
-    fseek(hist, 0, SEEK_END);
-    // fseek(hist, -4, SEEK_CUR);
-    fgetpos(hist, &position);
-    printf("pos: %ld\n", position.__pos);
-    char *cmdLine = calloc(1, MAX_PATH_SIZE);
+char *getUp(int index) {
+    openHistory("r");
+    char *cmdLine = calloc(sizeof(char), MAX_PATH_SIZE);
+    char *temp = calloc(sizeof(char), MAX_PATH_SIZE);
 
-    cmdLine = fgets(cmdLine, MAX_PATH_SIZE, hist);
-    printf("2-: %s\n", cmdLine);
+    int counter = 0;
+    while ((temp = fgets(temp, MAX_PATH_SIZE, hist)) != NULL) {
+        cmdLine = temp;
 
-    // fscanf(hist, "%s", cmdLine);
-    // printf("3-: %s\n", cmdLine);
-
-    return cmdLine;
+        if ((counter == (histLength - index - 1)) && (counter <= histLength)) {
+            cmdLine[strlen(cmdLine) - 1] = '\0';
+            closeHistory();
+            return cmdLine;
+        }
+        counter++;
+    }
+    return NULL;
 }
 
 char *getDown() {
 }
 
 void put(char *cmdLine) {
-    fprintf(hist, "%s\n", cmdLine);
-    // update();
+    if (((!histLength) || strcmp(getUp(0), cmdLine)) && (strlen(cmdLine) > 0)) {
+        openHistory("a");
+        fprintf(hist, "%s\n", cmdLine);
+        closeHistory();
+        update();
+    }
 }
 
 void openHistory(char *type) {
@@ -46,13 +50,40 @@ void closeHistory() {
 }
 
 void update() {
-    counter++;
-    closeHistory();
-    openHistory("w");
-    char *temp = calloc(sizeof(char), MAX_PATH_SIZE);
-    sprintf(temp, "LENGTH: %d", counter);
-    fprintf(hist, "%s", temp);
-    free(temp);
-    closeHistory();
-    openHistory("a");
+    char dataPath[MAX_PATH_SIZE];
+    sprintf(dataPath, HISTORY_DATA_PATH);
+    FILE *temp = fopen(dataPath, "w");
+    if (!hist) {
+        perror("Open history data");
+        return;
+    }
+
+    histLength++;
+
+    char *strtemp = calloc(sizeof(char), 64);
+    sprintf(strtemp, "LENGTH: %d", histLength);
+    fputs(strtemp, temp);
+    free(strtemp);
+    fclose(temp);
+}
+
+void initHistory() {
+    char dataPath[MAX_PATH_SIZE];
+    sprintf(dataPath, HISTORY_DATA_PATH);
+    FILE *temp = fopen(dataPath, "r");
+    if (!temp) {
+        perror("Open history data");
+        return;
+    }
+    char *strtemp = calloc(sizeof(char), MAX_PATH_SIZE);
+    int len = 0;
+    if (fscanf(temp, "%s %d", strtemp, &len)) {
+        if (strcmp(strtemp, "LENGTH: ")) histLength = len;
+    }
+    free(strtemp);
+    fclose(temp);
+}
+
+int getLength() {
+    return histLength;
 }

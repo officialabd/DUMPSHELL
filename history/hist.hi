@@ -1,6 +1,17 @@
-ps
 cd
-pwd
-12
+ps
+kill
+cd
+cd ..
+ps -A
+clear
+cd
+kill -l
+cd
 test
+cd Documents
+pwd
+ls
+cd Documents
+ps -A
 clear

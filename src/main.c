@@ -141,30 +141,30 @@ void free_commands(struct cmd *clist) {
 }
 
 char *get_command(char *buf, int size, FILE *in) {
+    int prev = 0;
     if (in == stdin) {
         char *username = getlogin();
         char *path = getcwd_(MAX_PATH_SIZE);
         if (strlen(path) >= (6 + strlen(username))) path += 9;
         char *firstLine = calloc(CHAR_SIZE, MAX_PATH_SIZE);
         sprintf(firstLine, "\033[31m%s@%s\033[0m:\033[32m~%s\033[0m@ ", username, username, path);
+        prev = (2 * strlen(username)) + strlen(path) + 4;
         fputs(firstLine, stdout);
         free(firstLine);
     }
-    // buf = calloc(CHAR_SIZE, MAX_PATH_SIZE);
-    buf = handleInput(buf, size);
-    // openHistory("a");
-    // put(buf);
-    // closeHistory();
+    buf = handleInput(buf, size, prev);
     return buf;
 }
 
 void main(void) {
+    initHistory();
     char linebuf[MAXLINELEN];
     struct cmd *commands;
 
     char *ch = "clear";
     commands = parse_commands(ch);
     execute(commands);
+
     ch = get_command(linebuf, MAXLINELEN, stdin);
     while (&ch != NULL) {
         commands = parse_commands(ch);

@@ -5,6 +5,7 @@
 
 #define MAX_PATH_SIZE 1024
 #define HISTORY_PATH "/home/abd/Documents/VSCode-Workspace/dumpshell/history/hist.hi"
+#define HISTORY_DATA_PATH "/home/abd/Documents/VSCode-Workspace/dumpshell/history/historyData.da"
 
 FILE *hist; /** File pointer to the history file (/history/hist.hi)*/
 
@@ -15,7 +16,7 @@ FILE *hist; /** File pointer to the history file (/history/hist.hi)*/
  * @param[out] cmdLine 
  * @return Char pointer to command line
  */
-char *getUp();
+char *getUp(int index);
 
 /**
  * This function get the next from the current command if available. 
@@ -52,3 +53,7 @@ void closeHistory();
  * @return No return value (void)
  */
 void update();
+
+void initHistory();
+
+int getLength();

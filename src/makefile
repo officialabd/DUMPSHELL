@@ -1,5 +1,5 @@
 OBJ_MAIN = main.c
-HANDLERS = handlers/inputHandler.c handlers/historyHandler.c handlers/commandsHandler.c
+HANDLERS = handlers/inputHandler.c handlers/historyHandler.c handlers/commandsHandler.c handlers/pipeHandler.c
 COMMANDS = commands/psCommand.c commands/pwdCommand.c commands/cdCommand.c commands/killCommand.c
 CC = gcc
 OBJ_NAME = ../out/a

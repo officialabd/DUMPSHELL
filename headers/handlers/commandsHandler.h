@@ -6,8 +6,11 @@
 #include "../commands/pwdCommand.h"
 #include "historyHandler.h"
 
-#define MAXARGS 128
+#define MAXARGS 1024
 
+/**
+ * struct command: used to store the data for user input command
+ */
 struct cmd {
     struct cmd *next;
     int terminator;

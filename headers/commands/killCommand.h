@@ -17,7 +17,7 @@
 void killHandler(char **arg);
 
 /**
- * It send a signal to a process 
+ * It sends a signal to a process 
  * @param pid the process id
  * @param sig The type of the signal that should be sent
  * @return no return value (void)

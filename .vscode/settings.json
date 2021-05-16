@@ -20,6 +20,8 @@
         "killcommand.h": "c",
         "historyhandler.h": "c",
         "signal.h": "c",
-        "commandshandler.h": "c"
+        "commandshandler.h": "c",
+        "pipehandler.h": "c",
+        "limits": "c"
     }
 }

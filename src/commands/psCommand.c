@@ -3,10 +3,10 @@
 void ips(char **args) {
     printf("%6s%12s\t%1s\t%12s\t%s\n", "PID", "TTY", "STATE", "TIME", "CMD");
 
-    if (!(args[1])) {
+    if (!(args[1])) { /** Prints the current process data and it's parent data */
         printProc(getppid());
         printProc(getpid());
-    } else if (!(strcmp(args[1], "-A")) || !(strcmp(args[1], "-a"))) {
+    } else if (!(strcmp(args[1], "-A")) || !(strcmp(args[1], "-a"))) { /** Prints all processes*/
         struct dirent *sd;
         DIR *dir = opendir("/proc");
         if (dir == NULL) {
@@ -22,7 +22,7 @@ void ips(char **args) {
                 }
             }
         }
-    } else {
+    } else { /** Prints the specified pids provided by the user*/
         int i = 1;
         while (args[i] != NULL) {
             int pid = strtol(args[i++], NULL, 10);
@@ -54,10 +54,10 @@ void printProc(int pid) {
 char **getStat(char **data, int pid) {
     char statPath[MAX_PATH_SIZE], fdPath[MAX_PATH_SIZE];
 
-    sprintf(statPath, "/proc/%d/stat", pid);
+    sprintf(statPath, "/proc/%d/stat", pid); /** Open the file stat of process (pid)*/
     FILE *statFile = fopen(statPath, "r");
 
-    sprintf(fdPath, "/proc/%d/fd/%d", pid, 0);
+    sprintf(fdPath, "/proc/%d/fd/%d", pid, 0); /** Open the fd 0 of process to get the terminal name*/
     int fdFile = open(fdPath, O_RDONLY);
 
     if (!statFile) {
@@ -77,12 +77,13 @@ char **getStat(char **data, int pid) {
 
     char cmd[64];
     char state;
-    unsigned long long tty;  //long long
+    unsigned long long tty;
     unsigned long utime, stime;
 
+    /** Read all data from stat file*/
     fscanf(statFile, "%*d %s %c %*d %*d %*d %llu %*d %*d %*d %*d %*d %*d %lu %lu", cmd, &state, &tty, &utime, &stime);
 
-    char *tty2 = ttyname(fdFile);
+    char *tty2 = ttyname(fdFile); /** Get tty from fd 0*/
     if (!tty2) {
         tty2 = "     ?";
     }

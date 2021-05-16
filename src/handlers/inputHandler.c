@@ -23,12 +23,14 @@ char *handleInput(char *cmdLine, int size, int prev) {
             cursor_index++;
             histIndex = 0;
         } else if (c == BACKSPACE) {
-            if (backspace(cmdLine, cursor_index)) {
-                chars_no--;
-                cursor_index--;
-                histIndex = 0;
-                cmdLine[cursor_index + 1] = 0;
-                cmdLine[cursor_index] = '\0';
+            if (cursor_index >= chars_no) {
+                if (backspace(cmdLine, cursor_index)) {
+                    chars_no--;
+                    cursor_index--;
+                    histIndex = 0;
+                    cmdLine[cursor_index + 1] = 0;
+                    cmdLine[cursor_index] = '\0';
+                }
             }
         } else if (c == '\33') {
             char ch = getchar();
@@ -37,7 +39,7 @@ char *handleInput(char *cmdLine, int size, int prev) {
                 switch (c) {
                     case KEY_UP:
                         if (histIndex < getLength()) {
-                            reTemp = getUp(++histIndex);
+                            reTemp = get(++histIndex);
                             if (reTemp) {
                                 cmdLine = reTemp;
                                 clear(NULL, chars_no + 1);
@@ -50,7 +52,7 @@ char *handleInput(char *cmdLine, int size, int prev) {
                         break;
                     case KEY_DOWN:
                         if (--histIndex >= 0) {
-                            reTemp = getUp(histIndex);
+                            reTemp = get(histIndex);
                             if (reTemp) {
                                 cmdLine = reTemp;
                                 clear(NULL, chars_no + 1);

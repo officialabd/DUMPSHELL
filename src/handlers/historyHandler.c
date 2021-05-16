@@ -3,7 +3,7 @@
 int current_index = 0; /** Used to determine the current index of the cmdLine*/
 int histLength = 0;
 
-char *getUp(int index) {
+char *get(int index) {
     openHistory("r");
     char *cmdLine = calloc(sizeof(char), MAX_PATH_SIZE);
     char *temp = calloc(sizeof(char), MAX_PATH_SIZE);
@@ -26,7 +26,7 @@ char *getDown() {
 }
 
 void put(char *cmdLine) {
-    if (((!histLength) || strcmp(getUp(0), cmdLine)) && (strlen(cmdLine) > 0)) {
+    if (((!histLength) || strcmp(get(0), cmdLine)) && (strlen(cmdLine) > 0)) {
         openHistory("a");
         fprintf(hist, "%s\n", cmdLine);
         closeHistory();

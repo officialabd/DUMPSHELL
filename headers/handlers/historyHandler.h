@@ -16,7 +16,7 @@ FILE *hist; /** File pointer to the history file (/history/hist.hi)*/
  * @param[out] cmdLine 
  * @return Char pointer to command line
  */
-char *getUp(int index);
+char *get(int index);
 
 /**
  * This function get the next from the current command if available. 
@@ -54,6 +54,16 @@ void closeHistory();
  */
 void update();
 
+/**
+ * Check all the required to use the history (length, ..)
+ * YOU SHOULD USE THIS FUNCTION BEFORE ANY USAGE OF HISTORY
+ * @return No return value (void)
+ */
 void initHistory();
 
+/**
+ * Number of commands
+ * YOU SHOULD USE THIS FUNCTION BEFORE ANY USAGE OF HISTORY
+ * @return int The total number of commands in the history.
+ */
 int getLength();

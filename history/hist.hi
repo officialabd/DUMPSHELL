@@ -15,3 +15,104 @@ ls
 cd Documents
 ps -A
 clear
+ps
+test
+pwd
+test
+hello
+test
+te
+tes
+test
+test          
+pwd
+cd
+cd ~
+pwd
+kill
+cd
+pwd
+echo ""HI" | wc
+echo "HI" | wc
+who | wc
+ps | cd
+ps
+cd
+ps | cd
+ps
+cd
+ps | cd
+cd
+who | wc
+cd | ps
+who | wc
+cd | ps
+who | wc
+wc abd
+clear
+who | wc
+clear
+cd
+ps
+cd
+ps
+cd
+cd 
+cd
+cd      
+cd
+who | wc
+cd
+who | wc
+cd | ps
+cd
+ps
+cd
+ps
+cd | ps
+cd
+ps
+cd | ps
+who | wc
+echo "HI" | wc
+cd
+ps
+kill
+cd Documents
+pwd
+who | wc > TEST
+who > TEST
+who
+who > TEST
+who | wc > TEST
+who > TEST
+who | wc > TEST
+echo "HI" | wc
+who | wc > TEST
+echo "HI" | wc
+who | wc > TEST
+who | wc | echo "HI"
+who | wc | echo "HI" > TEST
+ps aux | grep root | grep sbin
+who | wc | echo "HI" > TEST
+ps aux | grep root | grep sbin
+echo "HI" | wc
+      1       1       5
+echo "HI" | wc
+      1       1       5
+echo "HI" | wc
+      1       1       5
+echo "HI" | wc
+who | wc
+echo HI | wc
+ps
+cd
+kill
+pwd
+echo HI | wc
+echo "HI" | wc
+who | wc
+pwd
+who |
+abd      :0           2021-05-16 03:27 (:0)
+who |

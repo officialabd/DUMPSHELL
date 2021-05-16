@@ -3,16 +3,16 @@
 void killHandler(char **arg) {
     pid_t pid;
     int sig;
-    if (!(arg[1])) {
+    if (!(arg[1])) { /** No arguments passed with the kill command.*/
         printf("\033[33mFew arguments\033[0m\n");
         printf("Try: \nkill pid\nor kill -l or kill -L\nor kill -SIGNAL pid0 pid1 pid2 ...\nor kill -NUMBER pid0 pid1 pid2 ...\n");
-    } else if ((!strcmp(arg[1], "-l")) || (!strcmp(arg[1], "-L"))) {
+    } else if ((!strcmp(arg[1], "-l")) || (!strcmp(arg[1], "-L"))) { /** Print all signals that the shell can send.*/
         printSIGNALS();
-    } else if (arg[1] && (arg[2] == NULL)) {
+    } else if (arg[1] && (arg[2] == NULL)) { /** Send SIGTERM to the pid provided by the user*/
         pid = strtol(arg[1], NULL, 10);
         sig = SIGTERM;
         ikill(pid, sig);
-    } else { /** if (c->arg[1] && (c->arg[2] != NULL)) */
+    } else { /** Send a signal that user specify to the 1 pid or more, provided by the user.*/
 
         if ((arg[1])[0] == '-') {
             sig = strtol((arg[1] + 1), NULL, 10);

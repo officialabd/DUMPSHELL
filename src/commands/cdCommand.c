@@ -18,7 +18,7 @@ void icd(char **args) {
             perror("chdir");
         }
         return;
-    } else if (!strcmp(args[1], "..")) {
+    } else if (!strcmp(args[1], "..")) { /** Change to the parent directory */
         if (chdir("..") == -1) {
             perror("chdir");
         }

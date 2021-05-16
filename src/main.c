@@ -11,8 +11,8 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include "../headers/handlers/commandsHandler.h"
 #include "../headers/handlers/inputHandler.h"
+#include "../headers/handlers/pipeHandler.h"
 
 #define DEBUG 1
 #define MAXLINELEN 4096
@@ -20,10 +20,8 @@
 #define SEQ_OP ';'
 #define SEQUENCE 1
 #define MAX_PATH_SIZE 1024
-#define UP "UP"
-#define DOWN "DOWN"
-#define LEFT "LEFT"
-#define RIGHT "RIGHT"
+
+int parsePipe(char *cmdLine);
 
 /**
  * Allocate size bytes of memory.
@@ -71,11 +69,10 @@ struct cmd *parse_commands(char *line) {
     ix = 1;
     for (;;) {
         ptr = skip_to_ws_or_sep(ptr);
-
         if (!ptr) {
             break;
         }
-        if (*ptr == SEQ_OP) {
+        if ((*ptr == SEQ_OP)) {
             *ptr = 0;
             cur->next = parse_commands(ptr + 1);
             if (cur->next) {
@@ -83,6 +80,7 @@ struct cmd *parse_commands(char *line) {
             }
             break;
         }
+
         *ptr = 0;
         ptr = skip_to_non_ws(ptr + 1);
         if (!ptr) {
@@ -127,9 +125,84 @@ void execute(struct cmd *clist) {
             execute(clist->next);
     }
 }
+/**
+ * This function parse the user input into commands
+ * @param cmdLine String the user input
+ * @return int (0 or 1) return 1 if there are pipe or redirection or both, 0 if there is no pipe and redirection
+*/
+int parsePipe(char *cmdLine) {
+    char *cmdtemp = (char *)calloc(sizeof(char), MAX_LINE_SIZE);
+    strcpy(cmdtemp, cmdLine);
 
-// cd home
-// kill print
+    int isTherePipe = 0, isThereRedirection = 0;
+    struct cmd *cmd_1, *cmd_2, *cmd_3;
+
+    cmd_1 = ck_malloc(sizeof *cmd_1);
+    cmd_1->next = 0;
+    cmd_1->terminator = END_OF_LINE;
+    cmd_1->exe_path = (char *)ck_malloc(MAX_LINE_SIZE);
+
+    cmd_2 = ck_malloc(sizeof *cmd_2);
+    cmd_2->next = 0;
+    cmd_2->terminator = END_OF_LINE;
+    cmd_2->exe_path = (char *)ck_malloc(MAX_LINE_SIZE);
+
+    cmd_3 = ck_malloc(sizeof *cmd_3);
+    cmd_3->next = 0;
+    cmd_3->terminator = END_OF_LINE;
+    cmd_3->exe_path = (char *)ck_malloc(MAX_LINE_SIZE);
+
+    char *temp = (char *)calloc(sizeof(char), MAX_LINE_SIZE);
+    char *endFD = NULL;
+
+    int index = 0, count = 0;
+    while (temp = strsep(&cmdtemp, " ")) {
+        if (!strcmp(temp, "|")) {
+            index = 0;
+            isTherePipe++;
+        } else if (!strcmp(temp, ">")) {
+            isThereRedirection = 1;
+            endFD = (char *)calloc(sizeof(char), MAX_LINE_SIZE);
+
+            strcpy(endFD, cmdtemp);
+            break;
+        } else {
+            if (isTherePipe == 0) {
+                cmd_1->arg[index] = temp;
+                if (index == 0) {
+                    count++;
+                    strcpy(cmd_1->exe_path, temp);
+                }
+            } else if (isTherePipe == 1) {
+                cmd_2->arg[index] = temp;
+                if (index == 0) {
+                    count++;
+                    strcpy(cmd_2->exe_path, temp);
+                }
+            } else {
+                cmd_3->arg[index] = temp;
+                if (index == 0) {
+                    count++;
+                    strcpy(cmd_3->exe_path, temp);
+                }
+            }
+            index++;
+        }
+        temp = (char *)ck_malloc(MAX_LINE_SIZE);
+    }
+    if (isTherePipe == 0) {
+        cmd_2 = NULL;
+        cmd_3 = NULL;
+    }
+    if (isTherePipe == 1) {
+        cmd_3 = NULL;
+    }
+    if ((isTherePipe || isThereRedirection)) {
+        ipipe(cmd_1, cmd_2, cmd_3, count, isThereRedirection, endFD);
+    }
+    return (isTherePipe || isThereRedirection);
+}
+
 void free_commands(struct cmd *clist) {
     struct cmd *nxt;
 
@@ -145,7 +218,7 @@ char *get_command(char *buf, int size, FILE *in) {
     if (in == stdin) {
         char *username = getlogin();
         char *path = getcwd_(MAX_PATH_SIZE);
-        if (strlen(path) >= (6 + strlen(username))) path += 9;
+        if (strlen(path) >= (6 + strlen(username))) path += 6 + strlen(username);
         char *firstLine = calloc(CHAR_SIZE, MAX_PATH_SIZE);
         sprintf(firstLine, "\033[31m%s@%s\033[0m:\033[32m~%s\033[0m@ ", username, username, path);
         prev = (2 * strlen(username)) + strlen(path) + 4;
@@ -161,16 +234,18 @@ void main(void) {
     char linebuf[MAXLINELEN];
     struct cmd *commands;
 
-    char *ch = "clear";
-    commands = parse_commands(ch);
-    execute(commands);
+    char *ch = calloc(sizeof(char), MAX_LINE_SIZE);
 
     ch = get_command(linebuf, MAXLINELEN, stdin);
+
+    int i = 0;
     while (&ch != NULL) {
-        commands = parse_commands(ch);
-        if (commands) {
-            execute(commands);
-            free_commands(commands);
+        if (!parsePipe(ch)) {
+            commands = parse_commands(ch);
+            if (commands) {
+                execute(commands);
+                free_commands(commands);
+            }
         }
         ch = get_command(linebuf, MAXLINELEN, stdin);
     }

@@ -1,4 +1,4 @@
-*********************** WELCOME ***********************
+-----------------------// *** WELCOME *** //-----------------------
 
 This a dumpshell that implememts a few linux commands, 
 and a simple piping and redirection in c language.
@@ -7,8 +7,8 @@ and a simple piping and redirection in c language.
 
 
 **Run it by:**
- >> Got to src folder and open terminal there, then run this:
-   **sh run.sh**
+    Got to src folder and open terminal there, then run this:
+>> **sh run.sh**
 
 **Contact me on Gmail:** officialabdib@gmail.com
 

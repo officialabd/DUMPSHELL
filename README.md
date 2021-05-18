@@ -1,4 +1,4 @@
------------------------// *** WELCOME *** //-----------------------
+-----------------------// ***WELCOME*** //-----------------------
 
 This a dumpshell that implememts a few linux commands, 
 and a simple piping and redirection in c language.

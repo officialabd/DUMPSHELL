@@ -1,4 +1,5 @@
------------------------// #WELCOME //-----------------------
+-----------------------// 
+# WELCOME
 
 ## DESCRIPTION
 
@@ -9,9 +10,10 @@ and a simple piping and redirection in c language.
 
 
 ## Running the dumpshell:
-Go to src folder and open terminal there, then run this:
->> **sh run.sh**
-
+### Go to src folder and open terminal there, then run this:
+```
+sh run.sh
+```
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
@@ -23,4 +25,5 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 **Contact me on Gmail:** officialabdib@gmail.com
 
------------------------// #THANKS //-----------------------
+# THANKS 
+//-----------------------

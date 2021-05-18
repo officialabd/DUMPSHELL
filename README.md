@@ -1,4 +1,3 @@
------------------------// 
 # WELCOME
 
 ## DESCRIPTION
@@ -25,5 +24,4 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 **Contact me on Gmail:** officialabdib@gmail.com
 
-# THANKS 
-//-----------------------
+# THANKS

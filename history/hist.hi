@@ -152,3 +152,46 @@ kill kjsd
 kill sjfv
 kill 0
 kill kdf
+pwd > TEST
+pwd
+who > TEST
+pwd > TEST
+TEST > TEST
+who > TEST
+pwd > TEST
+ps > TEST
+ls > TEST
+ps > TEST
+kill > TEST
+kill
+ps
+cd
+pwd
+ps -l
+kill -l
+kill -l > TEST
+kill > TEST
+ps 
+ps > TEST
+pwd
+cd ..
+pwd
+cd src
+kill -l > TEST
+kill -l | wc > TEST
+kill -l | wc
+kill -l | wc > TEST
+kill | wc > TEST
+kill -l | wc > TEST
+kill -l | wc
+kill -l
+who > wc
+who > TEST
+who | test
+kill | test
+cd > TEST
+cd | wc > TEST
+"HELLO" | wc
+echo | wc
+echo HELLO | wc
+echo 1212 | wc > TEST

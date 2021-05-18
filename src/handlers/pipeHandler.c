@@ -21,7 +21,8 @@ void ipipe(struct cmd *cmd_1, struct cmd *cmd_2, struct cmd *cmd_3, int count, i
             }
         close(fd_1[0]);
         close(fd_1[1]);
-        if (redirect == 1) {
+
+        if ((count < 2) && (redirect == 1)) {
             int endFD = open(endPath, O_WRONLY | O_CREAT | O_TRUNC, 0600);
             if (endFD == -1) {
                 perror("open dir 1");
@@ -35,6 +36,8 @@ void ipipe(struct cmd *cmd_1, struct cmd *cmd_2, struct cmd *cmd_3, int count, i
             execvp(cmd_1->exe_path, cmd_1->arg);
             fprintf(stderr, "No such command: %s\n", cmd_1->exe_path);
         }
+
+        exit(0);
     }
     int fd_2[2];
     if (pipe(fd_2) < 0) {
@@ -58,7 +61,7 @@ void ipipe(struct cmd *cmd_1, struct cmd *cmd_2, struct cmd *cmd_3, int count, i
                 close(fd_2[0]);
                 close(fd_2[1]);
             }
-            if (redirect == 1) {
+            if ((count < 3) && redirect == 1) {
                 int endFD = open(endPath, O_WRONLY | O_CREAT | O_TRUNC, 0600);
                 if (endFD == -1) {
                     perror("open dir 1");
@@ -75,9 +78,9 @@ void ipipe(struct cmd *cmd_1, struct cmd *cmd_2, struct cmd *cmd_3, int count, i
                 execvp(cmd_2->exe_path, cmd_2->arg);
                 fprintf(stderr, "No such command: %s\n", cmd_2->exe_path);
             }
+            exit(0);
         }
     }
-    usleep(500);
     if ((cmd_3 != NULL) && (count > 2)) {  // -------------> Execute third command
         pid_3 = fork();
         if (pid_3 < 0) {
@@ -88,7 +91,6 @@ void ipipe(struct cmd *cmd_1, struct cmd *cmd_2, struct cmd *cmd_3, int count, i
             if (dup2(fd_2[0], STDIN_FILENO) == -1) {
                 perror("dup2 failed  (read) 3");
             }
-
             if (redirect == 1) {
                 int endFD = open(endPath, O_WRONLY | O_CREAT | O_TRUNC, 0600);
                 if (endFD == -1) {
@@ -105,6 +107,7 @@ void ipipe(struct cmd *cmd_1, struct cmd *cmd_2, struct cmd *cmd_3, int count, i
                 execvp(cmd_3->exe_path, cmd_3->arg);
                 fprintf(stderr, "No such command: %s\n", cmd_3->exe_path);
             }
+            exit(0);
         }
     }
     close(fd_1[0]);

@@ -116,3 +116,39 @@ pwd
 who |
 abd      :0           2021-05-16 03:27 (:0)
 who |
+cd
+kill
+ps
+who | wc
+echo HELLO | wc
+cd 
+pwd
+cd Documents
+cd LOL
+cd ~
+cd ..
+pwd
+cd ..
+pwd
+cd ..
+pwd
+clear
+cd home
+cd abd
+cd Documents
+pwd
+ps
+ps -A
+ps 1 2 4
+ps 564535
+ps 9 867  2 4 6 1 5 6 45 674
+pwd
+help
+kill
+kill -A
+kill dv
+kill isfbv
+kill kjsd
+kill sjfv
+kill 0
+kill kdf

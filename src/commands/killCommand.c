@@ -9,20 +9,24 @@ void killHandler(char **arg) {
     } else if ((!strcmp(arg[1], "-l")) || (!strcmp(arg[1], "-L"))) { /** Print all signals that the shell can send.*/
         printSIGNALS();
     } else if (arg[1] && (arg[2] == NULL)) { /** Send SIGTERM to the pid provided by the user*/
-        pid = strtol(arg[1], NULL, 10);
+        pid = atoi(arg[1]);
+        if (pid == 0) {
+            printf("Invalid argument\n  Try kill NUMBER\n");
+            return;
+        }
         sig = SIGTERM;
         ikill(pid, sig);
-    } else { /** Send a signal that user specify to the 1 pid or more, provided by the user.*/
 
+    } else { /** Send a signal that user specify to the 1 pid or more, provided by the user.*/
         if ((arg[1])[0] == '-') {
-            sig = strtol((arg[1] + 1), NULL, 10);
+            sig = atoi((arg[1] + 1));
             if (sig == 0) {
                 sig = findSig((arg[1] + 1));
                 if (sig == NO_SIG_FOUND) {
                     printf("Invalid argument\n  Try -SIGNAL\n");
                 }
             }
-            if (sig != -2) {
+            if (sig != NO_SIG_FOUND) {
                 int index = 2;
                 while (arg[index] != NULL) {
                     pid = strtol(arg[index++], NULL, 10);

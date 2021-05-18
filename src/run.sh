@@ -1,4 +1,4 @@
 rm ../out/a
 make
-# clear
+clear
 ./../out/a
